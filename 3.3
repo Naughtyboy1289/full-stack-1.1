@@ -1,0 +1,50 @@
+// Title: Person Class Hierarchy with Student and Teacher Subclasses
+// Objective: Demonstrate inheritance and method overriding in JavaScript (ES6 classes)
+
+// Base class: Person
+class Person {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+
+  // Method to display basic information
+  displayInfo() {
+    console.log(`Name: ${this.name}, Age: ${this.age}`);
+  }
+}
+
+// Subclass: Student (inherits from Person)
+class Student extends Person {
+  constructor(name, age, course) {
+    super(name, age); // Call the parent constructor
+    this.course = course;
+  }
+
+  // Override displayInfo method
+  displayInfo() {
+    console.log(`Student Name: ${this.name}, Age: ${this.age}, Course: ${this.course}`);
+  }
+}
+
+// Subclass: Teacher (inherits from Person)
+class Teacher extends Person {
+  constructor(name, age, subject) {
+    super(name, age);
+    this.subject = subject;
+  }
+
+  // Override displayInfo method
+  displayInfo() {
+    console.log(`Teacher Name: ${this.name}, Age: ${this.age}, Subject: ${this.subject}`);
+  }
+}
+
+// Creating instances
+const student1 = new Student("Alice", 20, "Computer Science");
+const teacher1 = new Teacher("Mr. Smith", 40, "Mathematics");
+
+// Demonstrating inheritance and method overriding
+console.log("=== Person Hierarchy Demo ===");
+student1.displayInfo();
+teacher1.displayInfo();
