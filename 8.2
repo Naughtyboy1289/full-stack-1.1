@@ -1,0 +1,96 @@
+// sql code
+CREATE DATABASE companydb;
+
+USE companydb;
+
+CREATE TABLE Employee (
+    EmpID INT PRIMARY KEY,
+    Name VARCHAR(50),
+    Salary DECIMAL(10,2)
+);
+
+INSERT INTO Employee VALUES (101, 'Alice', 50000);
+INSERT INTO Employee VALUES (102, 'Bob', 60000);
+INSERT INTO Employee VALUES (103, 'Charlie', 55000);
+//java code
+import java.io.*;
+import java.sql.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+
+public class EmployeeServlet extends HttpServlet {
+
+    // Database connection details
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/companydb";
+    private static final String DB_USER = "root";       // Change to your DB username
+    private static final String DB_PASS = "password";   // Change to your DB password
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+
+        String empIdParam = request.getParameter("empid");
+
+        out.println("<html><body>");
+        out.println("<h2>Employee Records</h2>");
+
+        // Search Form
+        out.println("<form method='get' action='EmployeeServlet'>");
+        out.println("Enter Employee ID: <input type='text' name='empid'>");
+        out.println("<input type='submit' value='Search'>");
+        out.println("</form><hr>");
+
+        try {
+            // Load JDBC driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            // Establish connection
+            Connection con = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASS);
+            Statement stmt = con.createStatement();
+            ResultSet rs;
+
+            if (empIdParam != null && !empIdParam.trim().isEmpty()) {
+                // If an employee ID is entered, fetch specific record
+                int empId = Integer.parseInt(empIdParam);
+                rs = stmt.executeQuery("SELECT * FROM Employee WHERE EmpID = " + empId);
+            } else {
+                // Otherwise, fetch all employee records
+                rs = stmt.executeQuery("SELECT * FROM Employee");
+            }
+
+            // Display results
+            out.println("<table border='1' cellpadding='8'>");
+            out.println("<tr><th>Employee ID</th><th>Name</th><th>Salary</th></tr>");
+
+            boolean found = false;
+            while (rs.next()) {
+                found = true;
+                out.println("<tr>");
+                out.println("<td>" + rs.getInt("EmpID") + "</td>");
+                out.println("<td>" + rs.getString("Name") + "</td>");
+                out.println("<td>" + rs.getDouble("Salary") + "</td>");
+                out.println("</tr>");
+            }
+
+            out.println("</table>");
+
+            if (!found) {
+                out.println("<p style='color:red;'>No employee found with the given ID.</p>");
+            }
+
+            // Close connection
+            rs.close();
+            stmt.close();
+            con.close();
+
+        } catch (Exception e) {
+            out.println("<h3>Error: " + e.getMessage() + "</h3>");
+            e.printStackTrace(out);
+        }
+
+        out.println("</body></html>");
+    }
+}
