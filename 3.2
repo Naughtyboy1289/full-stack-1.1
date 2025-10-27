@@ -1,0 +1,131 @@
+import React, { useState } from "react";
+
+function App() {
+  const [books, setBooks] = useState([
+    { title: "1984", author: "George Orwell" },
+    { title: "The Great Gatsby", author: "F. Scott Fitzgerald" },
+    { title: "To Kill a Mockingbird", author: "Harper Lee" },
+  ]);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [newTitle, setNewTitle] = useState("");
+  const [newAuthor, setNewAuthor] = useState("");
+
+  const handleAddBook = () => {
+    if (newTitle.trim() && newAuthor.trim()) {
+      setBooks([...books, { title: newTitle, author: newAuthor }]);
+      setNewTitle("");
+      setNewAuthor("");
+    }
+  };
+
+  const handleRemoveBook = (index) => {
+    const updatedBooks = books.filter((_, i) => i !== index);
+    setBooks(updatedBooks);
+  };
+
+  const filteredBooks = books.filter(
+    (book) =>
+      book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      book.author.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const containerStyle = {
+    fontFamily: "Segoe UI, sans-serif",
+    backgroundColor: "#f8f9fa",
+    padding: "20px",
+    minHeight: "100vh",
+    display: "flex",
+    justifyContent: "center",
+  };
+
+  const cardStyle = {
+    background: "white",
+    padding: "20px",
+    width: "450px",
+    border: "1px solid #ccc",
+    borderRadius: "6px",
+    boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+  };
+
+  const inputStyle = {
+    padding: "8px",
+    marginRight: "8px",
+    border: "1px solid #ccc",
+    borderRadius: "4px",
+  };
+
+  const buttonStyle = {
+    padding: "8px 12px",
+    backgroundColor: "#007bff",
+    color: "white",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+  };
+
+  const removeButtonStyle = {
+    backgroundColor: "#eee",
+    border: "1px solid #ccc",
+    borderRadius: "4px",
+    padding: "5px 10px",
+    cursor: "pointer",
+  };
+
+  const bookItemStyle = {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderBottom: "1px solid #ddd",
+    padding: "8px 0",
+  };
+
+  return (
+    <div style={containerStyle}>
+      <div style={cardStyle}>
+        <h2>Library Management</h2>
+        <input
+          type="text"
+          placeholder="Search by title or author"
+          style={{ ...inputStyle, width: "100%", marginBottom: "10px" }}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+
+        <div style={{ marginBottom: "15px" }}>
+          <input
+            type="text"
+            placeholder="New book title"
+            style={inputStyle}
+            value={newTitle}
+            onChange={(e) => setNewTitle(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="New book author"
+            style={inputStyle}
+            value={newAuthor}
+            onChange={(e) => setNewAuthor(e.target.value)}
+          />
+          <button style={buttonStyle} onClick={handleAddBook}>
+            Add Book
+          </button>
+        </div>
+
+        {filteredBooks.map((book, index) => (
+          <div key={index} style={bookItemStyle}>
+            <strong>{book.title}</strong> by {book.author}
+            <button
+              style={removeButtonStyle}
+              onClick={() => handleRemoveBook(index)}
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default App;
