@@ -1,0 +1,104 @@
+
+// sql code
+CREATE DATABASE schooldb;
+
+USE schooldb;
+
+CREATE TABLE Attendance (
+    StudentID INT,
+    AttendanceDate DATE,
+    Status VARCHAR(10)
+);
+
+//html code
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Attendance Portal</title>
+</head>
+<body>
+    <h2>Student Attendance Form</h2>
+
+    <form action="AttendanceServlet" method="post">
+        <label>Student ID:</label>
+        <input type="text" name="studentID" required><br><br>
+
+        <label>Date:</label>
+        <input type="date" name="date" required><br><br>
+
+        <label>Status:</label>
+        <select name="status" required>
+            <option value="Present">Present</option>
+            <option value="Absent">Absent</option>
+        </select><br><br>
+
+        <input type="submit" value="Submit Attendance">
+    </form>
+</body>
+</html>
+
+// java code
+import java.io.*;
+import java.sql.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+
+public class AttendanceServlet extends HttpServlet {
+
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/schooldb";
+    private static final String DB_USER = "root";       // change as needed
+    private static final String DB_PASS = "password";   // change as needed
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+
+        // Read form data
+        String studentID = request.getParameter("studentID");
+        String date = request.getParameter("date");
+        String status = request.getParameter("status");
+
+        try {
+            // Load JDBC driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            // Establish connection
+            Connection con = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASS);
+
+            // Prepare SQL statement
+            String sql = "INSERT INTO Attendance (StudentID, AttendanceDate, Status) VALUES (?, ?, ?)";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, Integer.parseInt(studentID));
+            ps.setString(2, date);
+            ps.setString(3, status);
+
+            // Execute update
+            int rowsInserted = ps.executeUpdate();
+
+            // Confirmation message
+            out.println("<html><body>");
+            if (rowsInserted > 0) {
+                out.println("<h2>Attendance recorded successfully!</h2>");
+                out.println("<p>Student ID: " + studentID + "</p>");
+                out.println("<p>Date: " + date + "</p>");
+                out.println("<p>Status: " + status + "</p>");
+            } else {
+                out.println("<h3 style='color:red;'>Error: Could not save attendance.</h3>");
+            }
+            out.println("<br><a href='attendance.jsp'>Go Back</a>");
+            out.println("</body></html>");
+
+            // Close resources
+            ps.close();
+            con.close();
+
+        } catch (Exception e) {
+            out.println("<h3>Error: " + e.getMessage() + "</h3>");
+            e.printStackTrace(out);
+        }
+    }
+}
